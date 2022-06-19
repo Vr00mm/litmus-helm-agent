@@ -29,7 +29,7 @@ image:
   repository: vr00mm/litmus-helm-agent-register
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "0.6.9"
 
 crds:
   create: true
