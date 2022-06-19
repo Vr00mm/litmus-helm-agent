@@ -1,5 +1,6 @@
 # litmus-helm-agent
 This is unofficial helm chart for litmus helm agent for litmus 2.8 (release -2)
+CLUSTER SCOPE ONLY
 
 ## Install local agent (same cluter):
 
