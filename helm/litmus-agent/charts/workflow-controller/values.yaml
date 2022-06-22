@@ -4,7 +4,7 @@
 
 appSettings:
   configmapName: "workflow-controller-configmap"
-  executorImage: "argoexec:v3.2.9"
+  executorImage: "litmuschaos/argoexec:v3.2.9"
   containerRuntimeExecutor: "k8sapi"
 
 crds:
