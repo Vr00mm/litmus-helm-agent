@@ -36,7 +36,7 @@ spec:
           - name: AGENT_DESCRIPTION
             value: {{ .Values.AGENT_DESCRIPTION | quote }}
           - name: AGENT_MODE
-            value: {{ .Values.AGENT_MODE }}
+            value: {{ .Values.global.AGENT_MODE }}
           - name: AGENT_CONFIGMAP_NAME
             value: {{ .Values.global.agentConfigName | quote }}
           - name: AGENT_SECRET_NAME

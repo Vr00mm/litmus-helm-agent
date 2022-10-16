@@ -18,8 +18,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-func prepareNewAgent() (types.Agent, error) {
-	var err error
+func prepareNewAgent() types.Agent {
 	var newAgent types.Agent
 	newAgent.AgentName = os.Getenv("AGENT_NAME")
 	newAgent.Namespace = os.Getenv("NAMESPACE")
@@ -28,14 +27,14 @@ func prepareNewAgent() (types.Agent, error) {
 	newAgent.Mode = os.Getenv("AGENT_MODE")
 	newAgent.SkipSSL = true
 
-	// -- OPTIONNAL -- //
+	// -- OPTIONAL -- //
 	newAgent.ClusterType = os.Getenv("CLUSTER_TYPE")
 	newAgent.NodeSelector = os.Getenv("AGENT_NODE_SELECTOR")
 	newAgent.PlatformName = os.Getenv("PLATFORM_NAME")
 	newAgent.ServiceAccount = os.Getenv("SERVICE_ACCOUNT_NAME")
 	newAgent.SAExists, _ = strconv.ParseBool(os.Getenv("SA_EXISTS"))
 	newAgent.NsExists, _ = strconv.ParseBool(os.Getenv("NS_EXISTS"))
-	return newAgent, err
+	return newAgent
 }
 
 func prepareAgentConfigMap() map[string]string {
@@ -78,15 +77,20 @@ func GetProjectID(credentials types.Credentials) string {
 		fmt.Printf("Error, cannot get project details: " + err.Error())
 		os.Exit(1)
 	}
+
 	for _, project := range userDetails.Data.Projects {
 		for _, member := range project.Members {
 			if (member.UserID == userDetails.Data.ID) && (member.Role == "Owner" || member.Role == "Editor") {
 				result = project.ID
+				break
 			}
 		}
 	}
+	if result == "" {
+		utils.Red.Println("\n❌ No project found with owner or editor access to current user" + "\n")
+		os.Exit(1)
+	}
 	return result
-
 }
 
 func GetAgentWithName(credentials types.Credentials, searchAgent types.Agent) (apis.AgentDetails, error) {
@@ -103,11 +107,7 @@ func GetAgentWithName(credentials types.Credentials, searchAgent types.Agent) (a
 }
 
 func CreateAgent(credentials types.Credentials) {
-	newAgent, err := prepareNewAgent()
-	if err != nil {
-		fmt.Printf("Error, cannot create agent: " + err.Error())
-		os.Exit(1)
-	}
+	newAgent := prepareNewAgent()
 
 	if newAgent.ProjectId == "" {
 		newAgent.ProjectId = GetProjectID(credentials)
@@ -115,18 +115,22 @@ func CreateAgent(credentials types.Credentials) {
 
 	agentExist, err := GetAgentWithName(credentials, newAgent)
 	if err != nil {
-		fmt.Printf("Error, cannot search if agent exist: " + err.Error())
+		utils.Red.Printf("\n❌ Error, cannot search if agent exist: %v", err.Error())
 		os.Exit(1)
 	}
 
 	if (agentExist == apis.AgentDetails{}) {
 		connectionData, err := apis.ConnectAgent(newAgent, credentials)
 		if err != nil {
-			fmt.Printf("Error, cannot declare agent. Error: " + err.Error() + "\n")
+			utils.Red.Println("\n❌ Chaos Delegate registration failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
 		if (connectionData.Data == apis.AgentConnect{}) {
 			fmt.Printf("❌ Agent empty: Registration failed did graphql change ? \n")
+			os.Exit(1)
+		}
+		if connectionData.Data.UserAgentReg.Token == "" {
+			utils.Red.Println("\n❌ failed to get the agent registration token: " + "\n")
 			os.Exit(1)
 		}
 		accessKey, err := validateAgent(connectionData.Data.UserAgentReg.Token, credentials.Endpoint)

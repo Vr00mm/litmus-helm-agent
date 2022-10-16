@@ -2,6 +2,8 @@ global:
   agentConfigName: agent-config
   agentSecretName: agent-secret
   podAnnotations: {}
+  # AGENT_MODE: cluster, namespace
+  AGENT_MODE: "cluster"
 # Default values for litmus-agent.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -9,8 +11,6 @@ global:
 AGENT_NAME: "helm-agent"
 AGENT_DESCRIPTION: "chaos agent deployed with helm"
 
-# AGENT_MODE: cluster, namespace
-AGENT_MODE: "cluster"
 AGENT_NODE_SELECTOR: ""
 SA_EXISTS: true
 NS_EXISTS: true

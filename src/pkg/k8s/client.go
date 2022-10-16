@@ -50,14 +50,11 @@ func CreateConfigMap(configmapName string, configMapData map[string]string, NAME
 		Data: configMapData,
 	}
 
-	var cm *corev1r.ConfigMap
-
-	cm, err := clientset.CoreV1().ConfigMaps(NAMESPACE).Update(context.TODO(), &configMap, metav1r.UpdateOptions{})
+	_, err := clientset.CoreV1().ConfigMaps(NAMESPACE).Update(context.TODO(), &configMap, metav1r.UpdateOptions{})
 	if err != nil {
 		fmt.Printf("❌ Cannot update configmap " + configmapName + " : " + err.Error() + "\n")
 		os.Exit(1)
 	}
-	_ = cm
 }
 
 func CreateSecret(secretName string, secretData map[string][]byte, NAMESPACE string) {

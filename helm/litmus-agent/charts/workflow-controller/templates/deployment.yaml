@@ -38,6 +38,9 @@ spec:
             - {{ .Values.appSettings.configmapName }}
             - --executor-image
             - {{ .Values.appSettings.executorImage | quote }}
+            {{- if eq .Values.global.AGENT_MODE "namepsace" }}
+            - --namespaced
+            {{- end}}
             - --container-runtime-executor
             - {{ .Values.appSettings.containerRuntimeExecutor }}
             - --loglevel
