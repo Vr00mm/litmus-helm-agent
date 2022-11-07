@@ -6,7 +6,7 @@ global:
 # Declare variables to be passed into your templates.
 
 appSettings: 
-  executorImage: "litmuschaos/argoexec:v3.2.9"
+  executorImage: "litmuschaos/argoexec:v3.3.1"
   containerRuntimeExecutor: "k8sapi"
 
 replicaCount: 1
